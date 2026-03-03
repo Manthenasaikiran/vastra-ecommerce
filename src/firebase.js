@@ -8,9 +8,10 @@ const firebaseConfig = {
   apiKey: "AIzaSyC6YSewN1s0QXigLIrzAUHsw-2HyzwyiAE",
   authDomain: "vastra-d572f.firebaseapp.com",
   projectId: "vastra-d572f",
-  storageBucket: "vastra-d572f.appspot.com",
+  storageBucket: "vastra-d572f.firebasestorage.app",
   messagingSenderId: "22353321508",
   appId: "1:22353321508:web:764c23bc07ce860f8182b1",
+  measurementId: "G-9XFH5R62Z8"
 };
 
 const app = initializeApp(firebaseConfig);

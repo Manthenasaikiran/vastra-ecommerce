@@ -1,70 +1,48 @@
+// src/pages/Signup.js
+
 import { useState } from "react";
-import { auth, provider } from "../firebase";
-import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
-} from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { auth } from "../firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
-export default function Login() {
-  const navigate = useNavigate();
-
+export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const login = async (e) => {
-    e.preventDefault();
+  const signup = async () => {
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      alert("Login successful");
-      navigate("/");
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  const googleLogin = async () => {
-    try {
-      await signInWithPopup(auth, provider);
-      alert("Google login success");
-      navigate("/");
-    } catch (err) {
-      alert(err.message);
+      await createUserWithEmailAndPassword(auth, email, password);
+      alert("Signup successful");
+    } catch (error) {
+      alert(error.message);
     }
   };
 
   return (
-    <div className="p-10 flex justify-center">
-      <div className="shadow-lg p-6 w-80">
-        <h2 className="text-xl mb-4">Login to Vastra</h2>
+    <div className="flex justify-center mt-10">
+      <div className="w-96 p-6 shadow-lg border rounded">
+        <h2 className="text-2xl font-bold mb-4">Signup</h2>
 
-        <form onSubmit={login} className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-            className="border p-2"
-          />
+        <input
+          className="w-full border p-2 mb-3"
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-            className="border p-2"
-          />
-
-          <button className="bg-black text-white p-2">
-            Login
-          </button>
-        </form>
-
-        <p className="text-center my-2">OR</p>
+        <input
+          className="w-full border p-2 mb-3"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
         <button
-          onClick={googleLogin}
-          className="bg-red-500 text-white p-2 w-full"
+          onClick={signup}
+          className="w-full bg-green-600 text-white p-2"
         >
-          Login with Google
+          Signup
         </button>
       </div>
     </div>

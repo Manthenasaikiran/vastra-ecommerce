@@ -1,68 +1,69 @@
+// src/pages/Login.js
+
 import { useState } from "react";
 import { auth, provider } from "../firebase";
 import {
   signInWithEmailAndPassword,
-  signInWithPopup,
+  signInWithPopup
 } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
 
 export default function Login() {
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const login = async (e) => {
-    e.preventDefault();
+  // Email login
+  const login = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       alert("Login successful");
-      navigate("/");
-    } catch (err) {
-      alert(err.message);
+    } catch (error) {
+      alert(error.message);
     }
   };
 
+  // Google login
   const googleLogin = async () => {
     try {
       await signInWithPopup(auth, provider);
-      alert("Google login success");
-      navigate("/");
-    } catch (err) {
-      alert(err.message);
+      alert("Google login successful");
+    } catch (error) {
+      alert(error.message);
     }
   };
 
   return (
-    <div className="p-10 flex justify-center">
-      <div className="shadow-lg p-6 w-80">
-        <h2 className="text-xl mb-4">Login to Vastra</h2>
+    <div className="flex justify-center mt-10">
+      <div className="w-96 p-6 shadow-lg border rounded">
+        <h2 className="text-2xl font-bold mb-4">Login to Vastra</h2>
 
-        <form onSubmit={login} className="flex flex-col gap-4">
-          <input
-            type="email"
-            placeholder="Email"
-            onChange={(e) => setEmail(e.target.value)}
-            className="border p-2"
-          />
+        <input
+          className="w-full border p-2 mb-3"
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
 
-          <input
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-            className="border p-2"
-          />
+        <input
+          className="w-full border p-2 mb-3"
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-          <button className="bg-black text-white p-2">
-            Login
-          </button>
-        </form>
+        <button
+          onClick={login}
+          className="w-full bg-blue-600 text-white p-2 mb-3"
+        >
+          Login
+        </button>
 
-        <p className="text-center my-2">OR</p>
+        <p className="text-center mb-2">OR</p>
 
         <button
           onClick={googleLogin}
-          className="bg-red-500 text-white p-2 w-full"
+          className="w-full bg-red-500 text-white p-2"
         >
           Login with Google
         </button>
