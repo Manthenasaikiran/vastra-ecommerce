@@ -1,94 +1,216 @@
-import { useCart } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function Cart() {
-  const { cart, removeFromCart, updateQuantity } = useCart();
+function Cart() {
 
-  const total = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
+  const navigate = useNavigate();
 
-  if (cart.length === 0) {
-    return (
-      <div className="p-6 text-center">
-        <h2 className="text-2xl font-bold">Your cart is empty 🛒</h2>
-        <Link
-          to="/"
-          className="mt-4 inline-block bg-black text-white px-6 py-2 rounded"
-        >
-          Continue Shopping
-        </Link>
-      </div>
+  const [cartItems, setCartItems] = useState([]);
+
+  // Load cart
+  useEffect(() => {
+
+    const storedCart =
+      JSON.parse(localStorage.getItem("cart")) || [];
+
+    setCartItems(storedCart);
+
+  }, []);
+
+  // Remove item
+  const removeItem = (id) => {
+
+    const updatedCart =
+      cartItems.filter(item => item.id !== id);
+
+    setCartItems(updatedCart);
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updatedCart)
     );
-  }
+
+  };
+
+  // Increase quantity
+  const increaseQty = (id) => {
+
+    const updatedCart = cartItems.map(item => {
+
+      if(item.id === id){
+        return {
+          ...item,
+          quantity: item.quantity + 1
+        }
+      }
+
+      return item;
+
+    });
+
+    setCartItems(updatedCart);
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updatedCart)
+    );
+
+  };
+
+  // Decrease quantity
+  const decreaseQty = (id) => {
+
+    const updatedCart = cartItems.map(item => {
+
+      if(item.id === id && item.quantity > 1){
+        return {
+          ...item,
+          quantity: item.quantity - 1
+        }
+      }
+
+      return item;
+
+    });
+
+    setCartItems(updatedCart);
+
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updatedCart)
+    );
+
+  };
+
+  // Calculate total price
+  const totalPrice = cartItems.reduce(
+
+    (total,item)=>
+      total + item.price * item.quantity,
+
+    0
+
+  );
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Your Cart</h2>
 
-      {cart.map((item) => (
-        <div
-          key={item.id}
-          className="flex items-center justify-between border p-4 mb-4 rounded"
-        >
-          <div className="flex items-center gap-4">
-            <img
-              src={item.image}
-              alt={item.name}
-              className="w-20 h-20 object-cover rounded"
-            />
+    <div className="container mx-auto p-6">
 
-            <div>
-              <h3 className="font-semibold">{item.name}</h3>
-              <p>₹{item.price}</p>
-            </div>
-          </div>
+      <h1 className="text-3xl font-bold mb-6">
+        Shopping Cart
+      </h1>
 
-          {/* Quantity */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() =>
-                updateQuantity(item.id, item.quantity - 1)
-              }
-              className="px-3 py-1 bg-gray-200 rounded"
-            >
-              -
-            </button>
+      {cartItems.length === 0 ? (
 
-            <span>{item.quantity}</span>
+        <div>
 
-            <button
-              onClick={() =>
-                updateQuantity(item.id, item.quantity + 1)
-              }
-              className="px-3 py-1 bg-gray-200 rounded"
-            >
-              +
-            </button>
-          </div>
+          <p>Your cart is empty</p>
 
-          {/* Remove */}
           <button
-            onClick={() => removeFromCart(item.id)}
-            className="bg-red-500 text-white px-4 py-1 rounded"
-          >
-            Remove
+          onClick={()=>navigate("/products")}
+          className="mt-4 bg-black text-white px-4 py-2 rounded">
+
+          Go Shopping
+
           </button>
+
         </div>
-      ))}
 
-      {/* Total */}
-      <div className="mt-6 border-t pt-4">
-        <h3 className="text-xl font-bold">Total: ₹{total}</h3>
+      ) : (
 
-        <Link
-          to="/checkout"
-          className="bg-green-600 text-white px-6 py-2 rounded mt-4 inline-block"
-        >
-          Checkout
-        </Link>
-      </div>
+        <div className="flex gap-10">
+
+          {/* Cart Items */}
+
+          <div className="flex-1">
+
+            {cartItems.map(item => (
+
+              <div
+              key={item.id}
+              className="flex items-center border p-4 mb-4 rounded">
+
+                <img
+                src={item.image}
+                alt={item.name}
+                className="w-20 h-20 object-cover mr-4"
+                />
+
+                <div className="flex-1">
+
+                  <h3 className="font-semibold">
+                    {item.name}
+                  </h3>
+
+                  <p>₹{item.price}</p>
+
+                  <div className="flex items-center gap-3 mt-2">
+
+                    <button
+                    onClick={()=>decreaseQty(item.id)}
+                    className="px-3 border">
+                    -
+                    </button>
+
+                    <span>{item.quantity}</span>
+
+                    <button
+                    onClick={()=>increaseQty(item.id)}
+                    className="px-3 border">
+                    +
+                    </button>
+
+                  </div>
+
+                </div>
+
+                <button
+                onClick={()=>removeItem(item.id)}
+                className="text-red-500">
+
+                Remove
+
+                </button>
+
+              </div>
+
+            ))}
+
+          </div>
+
+
+          {/* Order Summary */}
+
+          <div className="w-80 border p-6 rounded">
+
+            <h2 className="text-xl font-semibold mb-4">
+              Order Summary
+            </h2>
+
+            <p>Total Items: {cartItems.length}</p>
+
+            <p className="font-bold mb-4">
+              Total Price: ₹{totalPrice}
+            </p>
+
+            <button
+            onClick={()=>navigate("/checkout")}
+            className="bg-black text-white w-full py-3 rounded">
+
+            Proceed to Checkout
+
+            </button>
+
+          </div>
+
+        </div>
+
+      )}
+
     </div>
+
   );
+
 }
+
+export default Cart;

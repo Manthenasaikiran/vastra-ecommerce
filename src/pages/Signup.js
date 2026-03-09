@@ -1,50 +1,158 @@
-// src/pages/Signup.js
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { useState } from "react";
-import { auth } from "../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+function Signup() {
 
-export default function Signup() {
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [gender, setGender] = useState("");
+  const [address, setAddress] = useState("");
 
-  const signup = async () => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      alert("Signup successful");
-    } catch (error) {
-      alert(error.message);
+  const handleSignup = () => {
+
+    if (!name || !email || !mobile) {
+      alert("Please fill all required fields");
+      return;
     }
+
+    if (mobile.length !== 10) {
+      alert("Enter valid 10 digit mobile number");
+      return;
+    }
+
+    const userData = {
+      name,
+      email,
+      mobile,
+      gender,
+      address
+    };
+
+    // Save user
+    localStorage.setItem("vastraUser", JSON.stringify(userData));
+
+    alert("Account Created Successfully 🎉");
+
+    navigate("/");
+
   };
 
   return (
-    <div className="flex justify-center mt-10">
-      <div className="w-96 p-6 shadow-lg border rounded">
-        <h2 className="text-2xl font-bold mb-4">Signup</h2>
+
+    <div style={styles.page}>
+
+      <div style={styles.card}>
+
+        <h2>Create Account</h2>
 
         <input
-          className="w-full border p-2 mb-3"
+          type="text"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e)=>setName(e.target.value)}
+          style={styles.input}
+        />
+
+        <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e)=>setEmail(e.target.value)}
+          style={styles.input}
         />
 
         <input
-          className="w-full border p-2 mb-3"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          type="tel"
+          placeholder="Mobile Number"
+          value={mobile}
+          maxLength="10"
+          onChange={(e)=>setMobile(e.target.value.replace(/\D/g,""))}
+          style={styles.input}
+        />
+
+        <select
+          value={gender}
+          onChange={(e)=>setGender(e.target.value)}
+          style={styles.input}
+        >
+          <option value="">Select Gender</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+
+        <textarea
+          placeholder="Address"
+          value={address}
+          onChange={(e)=>setAddress(e.target.value)}
+          style={styles.textarea}
         />
 
         <button
-          onClick={signup}
-          className="w-full bg-green-600 text-white p-2"
+          onClick={handleSignup}
+          style={styles.button}
         >
-          Signup
+          CREATE ACCOUNT
         </button>
+
       </div>
+
     </div>
+
   );
+
 }
+
+const styles = {
+
+  page:{
+    height:"100vh",
+    display:"flex",
+    justifyContent:"center",
+    alignItems:"center",
+    background:"#f5f5f5"
+  },
+
+  card:{
+    width:"400px",
+    background:"#fff",
+    padding:"30px",
+    borderRadius:"8px",
+    boxShadow:"0 4px 12px rgba(0,0,0,0.15)"
+  },
+
+  input:{
+    width:"100%",
+    padding:"12px",
+    marginTop:"10px",
+    border:"1px solid #ccc",
+    borderRadius:"6px"
+  },
+
+  textarea:{
+    width:"100%",
+    padding:"12px",
+    marginTop:"10px",
+    border:"1px solid #ccc",
+    borderRadius:"6px",
+    minHeight:"80px"
+  },
+
+  button:{
+    width:"100%",
+    padding:"12px",
+    marginTop:"20px",
+    background:"#ff3f6c",
+    color:"#fff",
+    border:"none",
+    borderRadius:"6px",
+    fontWeight:"bold",
+    cursor:"pointer"
+  }
+
+};
+
+export default Signup;

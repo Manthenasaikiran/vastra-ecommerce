@@ -1,19 +1,26 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
 import "./index.css";
+import App from "./App";
 
-// ✅ Import Cart Provider
+import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
+import { WishlistProvider } from "./context/WishlistContext";
 
-// ✅ Create root
+import { register } from "./serviceWorkerRegistration";
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
-// ✅ Wrap App with CartProvider
 root.render(
   <React.StrictMode>
-    <CartProvider>
-      <App />
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <WishlistProvider>
+          <App />
+        </WishlistProvider>
+      </CartProvider>
+    </AuthProvider>
   </React.StrictMode>
 );
+
+register();
