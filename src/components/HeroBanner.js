@@ -12,27 +12,32 @@ function HeroBanner() {
         backgroundImage: `url(${heroImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        height: "420px",
+        minHeight: "420px",
+        width: "100%",
         display: "flex",
         alignItems: "center",
-        justifyContent: "center"
+        justifyContent: "center",
+        padding: "20px"
       }}
     >
 
       <div
         style={{
-          background: "rgba(0,0,0,0.6)",
-          padding: "40px",
-          borderRadius: "10px",
-          textAlign: "center"
+          background: "rgba(0,0,0,0.65)",
+          padding: "30px",
+          borderRadius: "12px",
+          textAlign: "center",
+          maxWidth: "600px",
+          width: "100%"
         }}
       >
 
         <h1
           style={{
             color: "#fff",
-            fontSize: "36px",
-            marginBottom: "10px"
+            fontSize: "clamp(24px, 4vw, 36px)",
+            marginBottom: "10px",
+            lineHeight: "1.3"
           }}
         >
           New Men's Fashion Collection
@@ -41,7 +46,8 @@ function HeroBanner() {
         <p
           style={{
             color: "#ddd",
-            marginBottom: "20px"
+            marginBottom: "20px",
+            fontSize: "clamp(14px,2vw,16px)"
           }}
         >
           Discover trending outfits
@@ -52,10 +58,11 @@ function HeroBanner() {
           style={{
             background: "#fff",
             color: "#000",
-            padding: "10px 25px",
-            borderRadius: "6px",
+            padding: "12px 28px",
+            borderRadius: "8px",
             fontWeight: "bold",
-            textDecoration: "none"
+            textDecoration: "none",
+            display: "inline-block"
           }}
         >
           Shop Now
