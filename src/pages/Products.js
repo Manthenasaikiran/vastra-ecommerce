@@ -29,9 +29,11 @@ function Products() {
 
   }, [location.search]);
 
+
   let filteredProducts = [...products];
 
-  // SEARCH FROM NAVBAR
+
+  // SEARCH
   if (searchQuery) {
 
     filteredProducts = filteredProducts.filter((p) =>
@@ -40,7 +42,8 @@ function Products() {
 
   }
 
-  // BRAND
+
+  // BRAND FILTER
   if (filters.brand) {
 
     filteredProducts = filteredProducts.filter(
@@ -49,7 +52,8 @@ function Products() {
 
   }
 
-  // SIZE
+
+  // SIZE FILTER
   if (filters.size) {
 
     filteredProducts = filteredProducts.filter(
@@ -58,7 +62,8 @@ function Products() {
 
   }
 
-  // COLOR
+
+  // COLOR FILTER
   if (filters.color) {
 
     filteredProducts = filteredProducts.filter(
@@ -67,7 +72,8 @@ function Products() {
 
   }
 
-  // PRICE
+
+  // PRICE FILTER
   if (filters.price === "low") {
 
     filteredProducts = filteredProducts.filter(
@@ -92,7 +98,8 @@ function Products() {
 
   }
 
-  // SORT
+
+  // SORTING
   if (sort === "low") {
 
     filteredProducts.sort((a, b) => a.price - b.price);
@@ -113,20 +120,27 @@ function Products() {
 
   }
 
+
   return (
 
-    <div className="flex max-w-7xl mx-auto p-6 gap-6">
+    <div className="flex flex-col md:flex-row max-w-7xl mx-auto p-4 md:p-6 gap-6">
+
+      {/* FILTER SIDEBAR */}
 
       <FilterSidebar
         filters={filters}
         setFilters={setFilters}
       />
 
+
+      {/* PRODUCT AREA */}
+
       <div className="flex-1">
 
         <h1 className="text-2xl font-bold mb-4">
           All Products
         </h1>
+
 
         {/* SORT */}
 
@@ -147,6 +161,7 @@ function Products() {
 
         </div>
 
+
         {/* PRODUCTS */}
 
         {filteredProducts.length === 0 ? (
@@ -155,7 +170,7 @@ function Products() {
 
         ) : (
 
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
             {filteredProducts.map((product) => (
 

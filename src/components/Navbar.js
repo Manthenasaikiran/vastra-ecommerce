@@ -10,422 +10,374 @@ import menuIcon from "../assets/icons/menu.png";
 
 function Navbar() {
 
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [dark, setDark] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
-  const [search, setSearch] = useState("");
+const [menuOpen, setMenuOpen] = useState(false);
+const [dark, setDark] = useState(false);
+const [cartCount, setCartCount] = useState(0);
+const [search, setSearch] = useState("");
+const [installPrompt, setInstallPrompt] = useState(null);
 
-  const [installPrompt, setInstallPrompt] = useState(null);
 
+// CART COUNT
+useEffect(() => {
 
-  // CART COUNT
-  useEffect(() => {
+const updateCart = () => {
 
-    const updateCart = () => {
+const cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-      const cart = JSON.parse(localStorage.getItem("cart")) || [];
+const totalItems = cart.reduce(
+(sum, item) => sum + (item.quantity || 1),
+0
+);
 
-      const totalItems = cart.reduce(
-        (sum, item) => sum + (item.quantity || 1),
-        0
-      );
+setCartCount(totalItems);
 
-      setCartCount(totalItems);
+};
 
-    };
+updateCart();
 
-    updateCart();
+window.addEventListener("storage", updateCart);
 
-    window.addEventListener("storage", updateCart);
+return () => window.removeEventListener("storage", updateCart);
 
-    return () => window.removeEventListener("storage", updateCart);
+}, []);
 
-  }, []);
 
+// PWA INSTALL
+useEffect(() => {
 
-  // PWA INSTALL PROMPT
-  useEffect(() => {
+window.addEventListener("beforeinstallprompt", (e) => {
 
-    window.addEventListener("beforeinstallprompt", (e) => {
+e.preventDefault();
+setInstallPrompt(e);
 
-      e.preventDefault();
+});
 
-      setInstallPrompt(e);
+}, []);
 
-    });
 
-  }, []);
+const installApp = () => {
 
+if (!installPrompt) {
+alert("Install not available");
+return;
+}
 
-  const installApp = () => {
+installPrompt.prompt();
 
-    if (!installPrompt) {
+};
 
-      alert("Install not available");
 
-      return;
+// SEARCH
+const handleSearch = () => {
 
-    }
+if (search.trim() !== "") {
 
-    installPrompt.prompt();
+navigate(`/products?search=${search}`);
+setSearch("");
 
-  };
+}
 
+};
 
-  // SEARCH
-  const handleSearch = () => {
 
-    if (search.trim() !== "") {
+// LOGOUT
+const logout = () => {
 
-      navigate(`/products?search=${search}`);
+localStorage.removeItem("vastraUser");
+navigate("/login");
 
-      setSearch("");
+};
 
-    }
 
-  };
+// DARK MODE
+const toggleDark = () => {
 
+setDark(!dark);
 
-  // LOGOUT
-  const logout = () => {
+document.body.style.background = dark ? "#fff" : "#111";
+document.body.style.color = dark ? "#000" : "#fff";
 
-    localStorage.removeItem("vastraUser");
+};
 
-    navigate("/login");
 
-  };
+return (
 
+<nav style={styles.nav}>
 
-  // DARK MODE
-  const toggleDark = () => {
+<div style={styles.container}>
 
-    setDark(!dark);
+{/* LOGO */}
 
-    document.body.style.background = dark ? "#fff" : "#111";
-    document.body.style.color = dark ? "#000" : "#fff";
+<Link to="/" style={styles.logoBox}>
 
-  };
+<img src={logo} alt="logo" style={styles.logo}/>
 
+<span style={styles.brand}>Vastra</span>
 
-  return (
+</Link>
 
-    <nav style={styles.nav}>
 
-      <div style={styles.container}>
+{/* MENU DESKTOP */}
 
-        {/* LOGO */}
+<div style={styles.menuDesktop}>
 
-        <Link to="/" style={styles.logoBox}>
+<Link to="/" style={styles.link}>Home</Link>
+<Link to="/products" style={styles.link}>Products</Link>
+<Link to="/wishlist" style={styles.link}>Wishlist</Link>
+<Link to="/orders" style={styles.link}>Orders</Link>
+<Link to="/admin" style={styles.link}>Admin</Link>
 
-          <img src={logo} alt="logo" style={styles.logo}/>
+</div>
 
-          <span style={styles.brand}>
-            Vastra
-          </span>
 
-        </Link>
+{/* SEARCH */}
 
+<div style={styles.searchBox}>
 
-        {/* MENU */}
+<input
+type="text"
+placeholder="Search"
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+onKeyDown={(e)=> e.key === "Enter" && handleSearch()}
+style={styles.searchInput}
+/>
 
-        <div style={styles.menu}>
+<button onClick={handleSearch} style={styles.searchButton}>
 
-          <Link to="/" style={styles.link}>Home</Link>
+<img src={searchIcon} alt="search" style={styles.searchIcon}/>
 
-          <Link to="/products" style={styles.link}>Products</Link>
+</button>
 
-          <Link to="/wishlist" style={styles.link}>Wishlist</Link>
+</div>
 
-          <Link to="/orders" style={styles.link}>Orders</Link>
 
-          <Link to="/admin" style={styles.link}>Admin</Link>
+{/* ICONS */}
 
-        </div>
+<div style={styles.icons}>
 
+<Link to="/wishlist">
+<img src={wishlistIcon} alt="wishlist" style={styles.icon}/>
+</Link>
 
-        {/* SEARCH */}
 
-        <div style={styles.searchBox}>
+<Link to="/cart" style={styles.cartBox}>
 
-          <input
-            type="text"
-            placeholder="Search products"
-            value={search}
-            onChange={(e)=>setSearch(e.target.value)}
-            onKeyDown={(e)=> e.key === "Enter" && handleSearch()}
-            style={styles.searchInput}
-          />
+<img src={cartIcon} alt="cart" style={styles.icon}/>
 
-          <button onClick={handleSearch} style={styles.searchButton}>
+{cartCount > 0 && (
+<span style={styles.cartCount}>{cartCount}</span>
+)}
 
-            <img src={searchIcon} alt="search" style={styles.searchIcon}/>
+</Link>
 
-          </button>
 
-        </div>
+<Link to="/profile">
+<img src={userIcon} alt="profile" style={styles.icon}/>
+</Link>
 
 
-        {/* ICONS */}
+<button onClick={installApp} style={styles.install}>
+Install
+</button>
 
-        <div style={styles.icons}>
 
-          {/* Wishlist */}
+<button onClick={toggleDark} style={styles.darkButton}>
+🌙
+</button>
 
-          <Link to="/wishlist">
 
-            <img src={wishlistIcon} alt="wishlist" style={styles.icon}/>
+<button onClick={logout} style={styles.logout}>
+Logout
+</button>
 
-          </Link>
 
+{/* MOBILE MENU BUTTON */}
 
-          {/* Cart */}
+<button
+style={styles.menuButton}
+onClick={() => setMenuOpen(!menuOpen)}
+>
 
-          <Link to="/cart" style={styles.cartBox}>
+<img src={menuIcon} alt="menu" style={styles.icon}/>
 
-            <img src={cartIcon} alt="cart" style={styles.icon}/>
+</button>
 
-            {cartCount > 0 && (
+</div>
 
-              <span style={styles.cartCount}>
-                {cartCount}
-              </span>
+</div>
 
-            )}
 
-          </Link>
+{/* MOBILE MENU */}
 
+{menuOpen && (
 
-          {/* Profile */}
+<div style={styles.mobileMenu}>
 
-          <Link to="/profile">
+<Link to="/" style={styles.mobileLink}>Home</Link>
+<Link to="/products" style={styles.mobileLink}>Products</Link>
+<Link to="/wishlist" style={styles.mobileLink}>Wishlist</Link>
+<Link to="/orders" style={styles.mobileLink}>Orders</Link>
+<Link to="/cart" style={styles.mobileLink}>Cart</Link>
+<Link to="/admin" style={styles.mobileLink}>Admin Panel</Link>
 
-            <img src={userIcon} alt="profile" style={styles.icon}/>
+</div>
 
-          </Link>
+)}
 
+</nav>
 
-          {/* INSTALL APP BUTTON */}
-
-          <button
-            onClick={installApp}
-            style={styles.install}
-          >
-
-            Install App
-
-          </button>
-
-
-          {/* DARK MODE */}
-
-          <button
-            onClick={toggleDark}
-            style={styles.darkButton}
-          >
-
-            🌙
-
-          </button>
-
-
-          {/* LOGOUT */}
-
-          <button
-            onClick={logout}
-            style={styles.logout}
-          >
-
-            Logout
-
-          </button>
-
-
-          {/* MOBILE MENU */}
-
-          <button
-            style={styles.menuButton}
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-
-            <img src={menuIcon} alt="menu" style={styles.icon}/>
-
-          </button>
-
-        </div>
-
-      </div>
-
-
-      {/* MOBILE MENU */}
-
-      {menuOpen && (
-
-        <div style={styles.mobileMenu}>
-
-          <Link to="/" style={styles.mobileLink}>Home</Link>
-
-          <Link to="/products" style={styles.mobileLink}>Products</Link>
-
-          <Link to="/wishlist" style={styles.mobileLink}>Wishlist</Link>
-
-          <Link to="/orders" style={styles.mobileLink}>Orders</Link>
-
-          <Link to="/cart" style={styles.mobileLink}>Cart</Link>
-
-          <Link to="/admin" style={styles.mobileLink}>Admin Panel</Link>
-
-        </div>
-
-      )}
-
-    </nav>
-
-  );
+);
 
 }
 
 
 const styles = {
 
-  nav:{
-    background:"#111827",
-    color:"#fff",
-    padding:"15px 40px"
-  },
+nav:{
+background:"#111827",
+color:"#fff",
+padding:"10px 20px"
+},
 
-  container:{
-    display:"flex",
-    alignItems:"center",
-    justifyContent:"space-between"
-  },
+container:{
+maxWidth:"1200px",
+margin:"auto",
+display:"flex",
+alignItems:"center",
+justifyContent:"space-between",
+flexWrap:"wrap",
+gap:"10px"
+},
 
-  logoBox:{
-    display:"flex",
-    alignItems:"center",
-    textDecoration:"none",
-    color:"#fff"
-  },
+logoBox:{
+display:"flex",
+alignItems:"center",
+textDecoration:"none",
+color:"#fff"
+},
 
-  logo:{
-    height:"32px",
-    marginRight:"8px"
-  },
+logo:{
+height:"32px",
+marginRight:"8px"
+},
 
-  brand:{
-    fontSize:"20px",
-    fontWeight:"bold"
-  },
+brand:{
+fontSize:"20px",
+fontWeight:"bold"
+},
 
-  menu:{
-    display:"flex",
-    gap:"25px"
-  },
+menuDesktop:{
+display:"flex",
+gap:"20px"
+},
 
-  link:{
-    textDecoration:"none",
-    color:"#fff",
-    fontWeight:"500"
-  },
+link:{
+textDecoration:"none",
+color:"#fff",
+fontWeight:"500"
+},
 
-  searchBox:{
-    display:"flex",
-    alignItems:"center",
-    background:"#fff",
-    borderRadius:"6px",
-    padding:"4px",
-    width:"220px"
-  },
+searchBox:{
+display:"flex",
+alignItems:"center",
+background:"#fff",
+borderRadius:"6px",
+padding:"3px",
+width:"180px"
+},
 
-  searchInput:{
-    border:"none",
-    outline:"none",
-    padding:"6px",
-    flex:1,
-    fontSize:"14px",
-    color:"#000"
-  },
+searchInput:{
+border:"none",
+outline:"none",
+padding:"6px",
+flex:1,
+fontSize:"14px",
+color:"#000"
+},
 
-  searchButton:{
-    border:"none",
-    background:"transparent",
-    cursor:"pointer"
-  },
+searchButton:{
+border:"none",
+background:"transparent",
+cursor:"pointer"
+},
 
-  searchIcon:{
-    width:"18px"
-  },
+searchIcon:{
+width:"18px"
+},
 
-  icons:{
-    display:"flex",
-    gap:"15px",
-    alignItems:"center"
-  },
+icons:{
+display:"flex",
+alignItems:"center",
+gap:"12px"
+},
 
-  icon:{
-    width:"22px",
-    cursor:"pointer"
-  },
+icon:{
+width:"22px",
+cursor:"pointer"
+},
 
-  cartBox:{
-    position:"relative"
-  },
+cartBox:{
+position:"relative"
+},
 
-  cartCount:{
-    position:"absolute",
-    top:"-6px",
-    right:"-8px",
-    background:"red",
-    color:"#fff",
-    borderRadius:"50%",
-    fontSize:"12px",
-    padding:"2px 6px"
-  },
+cartCount:{
+position:"absolute",
+top:"-6px",
+right:"-8px",
+background:"red",
+color:"#fff",
+borderRadius:"50%",
+fontSize:"12px",
+padding:"2px 6px"
+},
 
-  logout:{
-    background:"#ff3f6c",
-    border:"none",
-    color:"#fff",
-    padding:"6px 10px",
-    borderRadius:"5px",
-    cursor:"pointer"
-  },
+logout:{
+background:"#ff3f6c",
+border:"none",
+color:"#fff",
+padding:"6px 10px",
+borderRadius:"5px",
+cursor:"pointer"
+},
 
-  install:{
-    background:"#22c55e",
-    border:"none",
-    color:"#fff",
-    padding:"6px 10px",
-    borderRadius:"5px",
-    cursor:"pointer"
-  },
+install:{
+background:"#22c55e",
+border:"none",
+color:"#fff",
+padding:"6px 10px",
+borderRadius:"5px",
+cursor:"pointer"
+},
 
-  darkButton:{
-    background:"#333",
-    border:"none",
-    color:"#fff",
-    padding:"6px 10px",
-    borderRadius:"5px",
-    cursor:"pointer"
-  },
+darkButton:{
+background:"#333",
+border:"none",
+color:"#fff",
+padding:"6px 10px",
+borderRadius:"5px",
+cursor:"pointer"
+},
 
-  menuButton:{
-    background:"none",
-    border:"none"
-  },
+menuButton:{
+background:"none",
+border:"none",
+display:"none"
+},
 
-  mobileMenu:{
-    marginTop:"15px",
-    display:"flex",
-    flexDirection:"column",
-    gap:"10px"
-  },
+mobileMenu:{
+marginTop:"10px",
+display:"flex",
+flexDirection:"column",
+gap:"10px"
+},
 
-  mobileLink:{
-    textDecoration:"none",
-    color:"#fff"
-  }
+mobileLink:{
+textDecoration:"none",
+color:"#fff"
+}
 
 };
 

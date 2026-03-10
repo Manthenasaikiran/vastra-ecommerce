@@ -6,7 +6,7 @@ function ProductCard({ product }) {
   const navigate = useNavigate();
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // Check wishlist when component loads
+  // Check wishlist
   useEffect(() => {
 
     const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
@@ -18,7 +18,7 @@ function ProductCard({ product }) {
   }, [product]);
 
 
-  // Open product details page
+  // Open product page
   const openProduct = () => {
 
     navigate(`/product/${product.id}`);
@@ -56,7 +56,7 @@ function ProductCard({ product }) {
   };
 
 
-  // Wishlist toggle
+  // Wishlist
   const toggleWishlist = () => {
 
     let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
@@ -82,50 +82,76 @@ function ProductCard({ product }) {
 
   return (
 
-    <div className="border rounded-lg p-4 shadow hover:shadow-lg transition">
+    <div className="bg-white border rounded-xl shadow-sm hover:shadow-lg transition duration-300 overflow-hidden">
 
       {/* Product Image */}
-      <img
-  loading="lazy"
-  src={product.image || "/placeholder.png"}
-  alt={product.name}
-  onError={(e)=>{e.target.src="/placeholder.png"}}
-  className="w-16 h-16 object-cover"
-/>
 
-      {/* Product Name */}
-      <h3
+      <div
+        className="cursor-pointer"
         onClick={openProduct}
-        className="text-lg font-semibold mt-3 cursor-pointer"
       >
-        {product.name}
-      </h3>
 
-      {/* Category */}
-      <p className="text-gray-500">
-        {product.category || "Fashion"}
-      </p>
+        <img
+          loading="lazy"
+          src={product.image || "/placeholder.png"}
+          alt={product.name}
+          onError={(e)=>{e.target.src="/placeholder.png"}}
+          className="w-full h-56 object-cover"
+        />
 
-      {/* Price */}
-      <p className="font-bold mt-1">
-        ₹{product.price}
-      </p>
+      </div>
 
-      <div className="flex justify-between items-center mt-4">
 
-        <button
-          onClick={addToCart}
-          className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+      <div className="p-4">
+
+        {/* Product Name */}
+
+        <h3
+          onClick={openProduct}
+          className="text-md font-semibold cursor-pointer hover:text-pink-600"
         >
-          Add to Cart
-        </button>
+          {product.name}
+        </h3>
 
-        <button
-          onClick={toggleWishlist}
-          className="text-2xl"
-        >
-          {isWishlisted ? "❤️" : "🤍"}
-        </button>
+
+        {/* Category */}
+
+        <p className="text-gray-500 text-sm mt-1">
+
+          {product.category || "Fashion"}
+
+        </p>
+
+
+        {/* Price */}
+
+        <p className="font-bold text-lg mt-2 text-black">
+
+          ₹{product.price}
+
+        </p>
+
+
+        {/* Buttons */}
+
+        <div className="flex justify-between items-center mt-4">
+
+          <button
+            onClick={addToCart}
+            className="bg-black text-white px-3 py-2 rounded-md text-sm hover:bg-gray-800 transition"
+          >
+            Add to Cart
+          </button>
+
+
+          <button
+            onClick={toggleWishlist}
+            className="text-2xl"
+          >
+            {isWishlisted ? "❤️" : "🤍"}
+          </button>
+
+        </div>
 
       </div>
 
