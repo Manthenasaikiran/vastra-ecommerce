@@ -1,0 +1,20 @@
+2026-04-25 01:00:28.399 +05:30 [INF] Now listening on: http://localhost:5120
+2026-04-25 01:00:28.457 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-25 01:00:28.461 +05:30 [INF] Hosting environment: Development
+2026-04-25 01:00:28.468 +05:30 [INF] Content root path: C:\Users\saiki\Desktop\VastraAPI\VastraAPI
+2026-04-25 01:00:38.135 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5120/swagger/index.html - null null
+2026-04-25 01:00:38.444 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5120/swagger/index.html - 304 null null 315.4403ms
+2026-04-25 01:00:38.462 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5120/swagger/swagger-ui.css - null null
+2026-04-25 01:00:38.462 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5120/swagger/swagger-ui-standalone-preset.js - null null
+2026-04-25 01:00:38.462 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5120/swagger/index.css - null null
+2026-04-25 01:00:38.462 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5120/swagger/swagger-ui-bundle.js - null null
+2026-04-25 01:00:38.464 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5120/swagger/index.js - null null
+2026-04-25 01:00:38.518 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5120/swagger/index.js - 304 null null 53.4653ms
+2026-04-25 01:00:38.521 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5120/swagger/index.css - 304 null null 59.0849ms
+2026-04-25 01:00:38.521 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5120/swagger/swagger-ui.css - 304 null null 60.3032ms
+2026-04-25 01:00:38.521 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5120/swagger/swagger-ui-standalone-preset.js - 304 null null 59.0876ms
+2026-04-25 01:00:38.523 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5120/swagger/swagger-ui-bundle.js - 304 null null 62.0209ms
+2026-04-25 01:00:38.618 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5120/swagger/v1/swagger.json - null null
+2026-04-25 01:00:38.619 +05:30 [INF] Request starting HTTP/1.1 GET http://localhost:5120/swagger/favicon-32x32.png - null null
+2026-04-25 01:00:38.641 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5120/swagger/favicon-32x32.png - 304 null null 21.827ms
+2026-04-25 01:00:39.003 +05:30 [INF] Request finished HTTP/1.1 GET http://localhost:5120/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 385.4498ms
