@@ -12,8 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 // ======================
 // DATABASE (SQLite)
 // ======================
+var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "vastra.db");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite("Data Source=vastra.db")
+    options.UseSqlite($"Data Source={dbPath}")
 );
 
 // ======================
@@ -103,12 +105,19 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // ======================
-// 🔥 AUTO MIGRATION FIX (VERY IMPORTANT)
+// 🔥 AUTO MIGRATION (CRITICAL FIX)
 // ======================
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();   // <-- THIS FIXES YOUR 500 ERROR
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();   // Creates DB + tables automatically
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Migration error: " + ex.Message);
+    }
 }
 
 // ======================
