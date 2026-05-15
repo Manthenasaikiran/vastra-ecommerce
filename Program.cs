@@ -28,13 +28,13 @@ builder.Services.AddControllers()
     });
 
 // ======================
-// CORS (React)
+// CORS (ALLOW ALL FOR NOW)
 // ======================
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowReact", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -47,7 +47,7 @@ var key = builder.Configuration["Jwt:Key"];
 
 if (string.IsNullOrEmpty(key))
 {
-    throw new Exception("JWT Key is missing in appsettings.json");
+    throw new Exception("JWT Key is missing");
 }
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -70,7 +70,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // ======================
-// SWAGGER
+// SWAGGER (ENABLE ALWAYS)
 // ======================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -113,17 +113,16 @@ var app = builder.Build();
 // MIDDLEWARE
 // ======================
 
-// Swagger (only in dev)
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// ✅ ENABLE SWAGGER IN PRODUCTION
+app.UseSwagger();
+app.UseSwaggerUI();
 
-// ✅ Serve static files (wwwroot)
+// ✅ DEFAULT ROUTE (no more 404)
+app.MapGet("/", () => "Vastra API is running 🚀");
+
+// ✅ STATIC FILES
 app.UseStaticFiles();
 
-// ✅ Serve images folder explicitly
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
@@ -132,12 +131,11 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 // ======================
-// PIPELINE ORDER (IMPORTANT)
+// PIPELINE
 // ======================
-
 app.UseRouting();
 
-app.UseCors("AllowReact");
+app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
