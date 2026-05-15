@@ -10,12 +10,10 @@ using VastraAPI.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // ======================
-// DATABASE
+// DATABASE (SQLite)
 // ======================
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
+    options.UseSqlite("Data Source=vastra.db")
 );
 
 // ======================
@@ -28,7 +26,7 @@ builder.Services.AddControllers()
     });
 
 // ======================
-// CORS (ALLOW ALL FOR NOW)
+// CORS
 // ======================
 builder.Services.AddCors(options =>
 {
@@ -47,7 +45,7 @@ var key = builder.Configuration["Jwt:Key"];
 
 if (string.IsNullOrEmpty(key))
 {
-    throw new Exception("JWT Key is missing");
+    throw new Exception("JWT Key is missing in appsettings.json");
 }
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -55,14 +53,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(key)
             )
@@ -70,7 +64,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // ======================
-// SWAGGER (ENABLE ALWAYS)
+// SWAGGER
 // ======================
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -87,8 +81,7 @@ builder.Services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter token only"
+        In = ParameterLocation.Header
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -110,17 +103,25 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 // ======================
+// 🔥 AUTO MIGRATION FIX (VERY IMPORTANT)
+// ======================
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();   // <-- THIS FIXES YOUR 500 ERROR
+}
+
+// ======================
 // MIDDLEWARE
 // ======================
-
-// ✅ ENABLE SWAGGER IN PRODUCTION
 app.UseSwagger();
 app.UseSwaggerUI();
 
-// ✅ DEFAULT ROUTE (no more 404)
 app.MapGet("/", () => "Vastra API is running 🚀");
 
-// ✅ STATIC FILES
+// ======================
+// STATIC FILES
+// ======================
 app.UseStaticFiles();
 
 app.UseStaticFiles(new StaticFileOptions

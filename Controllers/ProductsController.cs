@@ -1,13 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using VastraAPI.Data;
 using VastraAPI.Models;
 
 namespace VastraAPI.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -18,146 +17,98 @@ namespace VastraAPI.Controllers
         }
 
         // =========================
-        // ✅ GET ALL PRODUCTS (PUBLIC)
+        // ✅ GET ALL PRODUCTS
         // =========================
-        [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetProducts()
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            var products = _context.Products.ToList();
-            return Ok(products);
+            return await _context.Products
+                .OrderByDescending(p => p.Id)
+                .ToListAsync();
         }
 
         // =========================
         // ✅ GET PRODUCT BY ID
         // =========================
-        [AllowAnonymous]
         [HttpGet("{id}")]
-        public IActionResult GetProduct(int id)
+        public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = _context.Products.Find(id);
+            var product = await _context.Products.FindAsync(id);
 
             if (product == null)
-                return NotFound();
+                return NotFound(new { message = "Product not found" });
 
-            return Ok(product);
+            return product;
         }
 
         // =========================
-        // ➕ ADD PRODUCT (NO IMAGE)
+        // ✅ ADD PRODUCT
         // =========================
         [HttpPost]
-        public IActionResult AddProduct(Product product)
+        public async Task<IActionResult> AddProduct(Product product)
         {
-            if (product == null)
-                return BadRequest();
+            if (string.IsNullOrWhiteSpace(product.Name))
+                return BadRequest(new { message = "Product name is required" });
 
-            _context.Products.Add(product);
-            _context.SaveChanges();
+            if (product.Price <= 0)
+                return BadRequest(new { message = "Price must be greater than 0" });
 
-            return Ok(product);
+            await _context.Products.AddAsync(product);
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Product added successfully",
+                product
+            });
         }
 
         // =========================
-        // 🔍 SEARCH PRODUCT
-        // =========================
-        [AllowAnonymous]
-        [HttpGet("search")]
-        public IActionResult Search(string name)
-        {
-            var products = _context.Products
-                .Where(p => p.Name.ToLower().Contains(name.ToLower()))
-                .ToList();
-
-            return Ok(products);
-        }
-
-        // =========================
-        // ✏️ UPDATE PRODUCT
+        // ✅ UPDATE PRODUCT
         // =========================
         [HttpPut("{id}")]
-        public IActionResult UpdateProduct(int id, Product updated)
+        public async Task<IActionResult> UpdateProduct(int id, Product updatedProduct)
         {
-            var product = _context.Products.Find(id);
+            var product = await _context.Products.FindAsync(id);
 
             if (product == null)
-                return NotFound();
+                return NotFound(new { message = "Product not found" });
 
-            product.Name = updated.Name;
-            product.Price = updated.Price;
-            product.Category = updated.Category; // ✅ FIXED
+            if (string.IsNullOrWhiteSpace(updatedProduct.Name))
+                return BadRequest(new { message = "Product name is required" });
 
-            _context.SaveChanges();
+            if (updatedProduct.Price <= 0)
+                return BadRequest(new { message = "Price must be greater than 0" });
 
-            return Ok(product);
+            product.Name = updatedProduct.Name;
+            product.Price = updatedProduct.Price; // ✅ double
+            product.ImageUrl = updatedProduct.ImageUrl;
+            product.Category = updatedProduct.Category;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Product updated successfully",
+                product
+            });
         }
 
         // =========================
-        // ❌ DELETE PRODUCT (SAFE)
+        // ✅ DELETE PRODUCT
         // =========================
         [HttpDelete("{id}")]
-        public IActionResult DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = _context.Products.Find(id);
+            var product = await _context.Products.FindAsync(id);
 
             if (product == null)
-                return NotFound();
-
-            // ✅ Prevent delete if used in orders
-            bool isUsed = _context.OrderItems.Any(o => o.ProductId == id);
-
-            if (isUsed)
-                return BadRequest("❌ Cannot delete. Product used in orders.");
+                return NotFound(new { message = "Product not found" });
 
             _context.Products.Remove(product);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return Ok("Deleted successfully");
-        }
-
-        // =========================
-        // 📤 UPLOAD PRODUCT (WITH IMAGE)
-        // =========================
-        [HttpPost("upload")]
-        public IActionResult UploadProduct([FromForm] ProductUploadDto dto)
-        {
-            if (dto == null)
-                return BadRequest();
-
-            string fileName = null;
-
-            if (dto.Image != null)
-            {
-                var folderPath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot/images"
-                );
-
-                if (!Directory.Exists(folderPath))
-                    Directory.CreateDirectory(folderPath);
-
-                fileName = Guid.NewGuid() + Path.GetExtension(dto.Image.FileName);
-
-                var filePath = Path.Combine(folderPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    dto.Image.CopyTo(stream);
-                }
-            }
-
-            var product = new Product
-            {
-                Name = dto.Name,
-                Price = dto.Price,
-                Category = dto.Category, // ✅ IMPORTANT
-                ImageUrl = fileName != null ? $"/images/{fileName}" : null // ✅ FIXED
-            };
-
-            _context.Products.Add(product);
-            _context.SaveChanges();
-
-            return Ok(product);
+            return Ok(new { message = "Product deleted successfully" });
         }
     }
 }

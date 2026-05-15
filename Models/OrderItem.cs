@@ -18,6 +18,6 @@ namespace VastraAPI.Models
         public int Quantity { get; set; }
 
         // 💰 Price at time of purchase
-        public decimal Price { get; set; }
+        public double Price { get; set; }
     }
 }

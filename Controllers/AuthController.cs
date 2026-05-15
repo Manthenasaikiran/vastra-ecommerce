@@ -21,23 +21,45 @@ namespace VastraAPI.Controllers
             _config = config;
         }
 
-        // REGISTER
+        // =========================
+        // ✅ REGISTER
+        // =========================
         [HttpPost("register")]
-        public IActionResult Register(User user)
+        public IActionResult Register([FromBody] User user)
         {
-            if (_context.Users.Any(x => x.Username == user.Username))
+            if (user == null)
+                return BadRequest("Invalid data");
+
+            if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Password))
+                return BadRequest("Username and Password are required");
+
+            // Check existing user
+            var exists = _context.Users.Any(x => x.Username == user.Username);
+            if (exists)
                 return BadRequest("User already exists");
 
+            // (Optional but better) hash password here later
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            return Ok("Registered successfully");
+            return Ok(new
+            {
+                message = "Registered successfully"
+            });
         }
 
-        // LOGIN
+        // =========================
+        // ✅ LOGIN
+        // =========================
         [HttpPost("login")]
-        public IActionResult Login(LoginDto dto)
+        public IActionResult Login([FromBody] LoginDto dto)
         {
+            if (dto == null)
+                return BadRequest("Invalid data");
+
+            if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
+                return BadRequest("Username and Password are required");
+
             var user = _context.Users
                 .FirstOrDefault(x =>
                     x.Username == dto.Username &&
@@ -76,7 +98,11 @@ namespace VastraAPI.Controllers
 
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return Ok(new { token = jwt });
+            return Ok(new
+            {
+                token = jwt,
+                username = user.Username
+            });
         }
     }
 }

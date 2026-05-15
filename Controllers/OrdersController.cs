@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Razorpay.Api;
 using VastraAPI.Data;
 using VastraAPI.Models;
+
+// ✅ Alias to avoid conflict
+using RazorpayOrder = Razorpay.Api.Order;
 
 namespace VastraAPI.Controllers
 {
@@ -38,7 +40,7 @@ namespace VastraAPI.Controllers
                 Address = dto.Address,
                 PaymentMethod = "COD",
                 CreatedAt = DateTime.Now,
-                Status = "Placed", // 🔥 NEW
+                Status = "Placed",
                 OrderItems = new List<OrderItem>()
             };
 
@@ -61,7 +63,6 @@ namespace VastraAPI.Controllers
 
             await _context.Orders.AddAsync(order);
 
-            // Clear cart
             var cartItems = await _context.CartItems.ToListAsync();
             _context.CartItems.RemoveRange(cartItems);
 
@@ -88,7 +89,7 @@ namespace VastraAPI.Controllers
 
             var client = new RazorpayClient(key, secret);
 
-            decimal total = 0;
+            double total = 0;
 
             foreach (var item in dto.Items)
             {
@@ -107,7 +108,7 @@ namespace VastraAPI.Controllers
                 { "receipt", Guid.NewGuid().ToString() }
             };
 
-            var razorpayOrder = client.Order.Create(options);
+            RazorpayOrder razorpayOrder = client.Order.Create(options);
 
             return Ok(new
             {
@@ -118,7 +119,7 @@ namespace VastraAPI.Controllers
         }
 
         // =========================
-        // ✅ SAVE ORDER AFTER PAYMENT
+        // ✅ VERIFY PAYMENT + SAVE ORDER
         // =========================
         [HttpPost("verify-payment")]
         public async Task<IActionResult> VerifyPayment([FromBody] OrderDto dto)
@@ -129,7 +130,7 @@ namespace VastraAPI.Controllers
                 Address = dto.Address,
                 PaymentMethod = "ONLINE",
                 CreatedAt = DateTime.Now,
-                Status = "Placed", // 🔥 NEW
+                Status = "Placed",
                 OrderItems = new List<OrderItem>()
             };
 
@@ -152,7 +153,6 @@ namespace VastraAPI.Controllers
 
             await _context.Orders.AddAsync(order);
 
-            // Clear cart
             var cartItems = await _context.CartItems.ToListAsync();
             _context.CartItems.RemoveRange(cartItems);
 
@@ -162,7 +162,7 @@ namespace VastraAPI.Controllers
         }
 
         // =========================
-        // ✅ UPDATE ORDER STATUS
+        // ✅ UPDATE STATUS
         // =========================
         [HttpPut("update-status/{id}")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] string status)
@@ -195,9 +195,8 @@ namespace VastraAPI.Controllers
                     o.CustomerName,
                     o.Address,
                     o.PaymentMethod,
-                    o.Status, // 🔥 NEW
+                    o.Status,
                     o.CreatedAt,
-
                     orderItems = o.OrderItems.Select(i => new
                     {
                         i.ProductId,
@@ -205,7 +204,6 @@ namespace VastraAPI.Controllers
                         i.Quantity,
                         i.Price
                     }),
-
                     totalAmount = o.TotalAmount
                 })
                 .ToListAsync();

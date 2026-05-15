@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("VastraAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+67c213b3328404899db5ca0ad5f23a0891ec6319")]
 [assembly: System.Reflection.AssemblyProductAttribute("VastraAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("VastraAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

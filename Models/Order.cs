@@ -14,11 +14,11 @@ namespace VastraAPI.Models
 
         // 💳 Payment (IMPORTANT)
         public string PaymentMethod { get; set; } = "COD";
-        
+
         public string Status { get; set; } = "Placed";
 
         // 💰 Total price
-        public decimal TotalAmount { get; set; }
+        public double TotalAmount { get; set; }
 
         // 📦 Order Items (Products inside order)
         public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

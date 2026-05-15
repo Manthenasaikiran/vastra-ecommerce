@@ -27,7 +27,7 @@ namespace VastraAPI.Data
 
         public DbSet<Address> Addresses { get; set; }
 
-        public DbSet<Wishlist> Wishlists { get; set; }
+        
 
         // ⚙️ RELATIONSHIPS CONFIG
         protected override void OnModelCreating(ModelBuilder modelBuilder)
